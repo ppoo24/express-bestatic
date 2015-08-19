@@ -1,0 +1,27 @@
+{
+  "name": "express-bestatic",
+  "description": "Let your express web site's pages to be static",
+  "keywords": [
+    "express",
+    "static",
+    "bestatic"
+  ],
+  "version": "0.0.1",
+  "author": {
+    "name": "Wilson Zeng",
+    "email": "jackzcs@gmail.com",
+    "url": "https://github.com/ppoo24"
+  },
+  "license": "Apache-2.0",
+  "files": ["index.js"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ppoo24/express-bestatic.git"
+  },
+  "homepage": "https://github.com/ppoo24/express-bestatic",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=0.10.0"
+  }
+}
