@@ -8,8 +8,7 @@ var express = require('express');
 module.exports = function (app, options) {
 	options = defaults(options || {}, {
 		'translator': { //伪静态 与 回源 转换器
-			'pattern': /^([^-]*)?(?:-([^\/]*)?)_xs.html$/, //伪静态url匹配规则，仅匹配到的URL才会进入逻辑
-			'toNormal': fakeToNormal, //[转换函数]将伪静态URL转成正常URL，参数：matches(匹配结果数组)
+			'toNormal': fakeToNormal, //[转换函数]将伪静态URL转成正常URL，参数：url（绝对 或 相对地址）
 			'toFake': normalToFake //[转换函数]将正常URL转为伪静态URL，参数：url（绝对 或 相对地址）
 		},
 		'cache': true, //是否进行缓存
@@ -27,15 +26,10 @@ module.exports = function (app, options) {
 		req.linker = linker;
 
 		//---若是伪静态，则改写URL 为 正常URL
-		var matches = (req.url || '').match(translator['pattern']);
-		if (matches) { //【伪静态】替换 和 缓存
-			console.log('----------------【伪静态URL】', req.url);
-			//---将url转换为回源格式
-			req.url = req.originalUrl = translator.toNormal(matches);
-			console.log('--------------【转换为回源】', req.url);
-			//---重建query
-			req.query = undefined; //【促使后面重建query】
-		}
+		var oldUrl = req.url;
+		req.url = req.originalUrl = translator.toNormal(req.url);
+		//---重建query
+		if (req.url != oldUrl) { req.query = undefined; } //【促使后面重建query】
 		
 		//---使用缓存
 		if (options['cache']) {
@@ -75,19 +69,24 @@ module.exports = function (app, options) {
 ///////////////////////
 
 //将伪静态URL转换为正常的回源格式
-function fakeToNormal (matches) {
+function fakeToNormal (url) {
 	///decoration/tpllist-test1-x1-test2--test3-_xs.html
 	//-->
 	///decoration/tpllist?test1=x1&test2=&test3
-	var baseUrl = matches[1] || null,
-		params = matches[2] || null;
-	if (params) {
-		var tmpParts = [];
-		params = params.split('-');
-		for (var i = 0; i < params.length; i ++) { tmpParts.push(params[i] + '=' + params[++i]); }
-		params = tmpParts.join('&');
+	var matches = (url || '').match(/^([^-]*)(?:-([^\/]*)?)_xs.html$/);
+	if (matches) { //【伪静态】替换 和 缓存
+		console.log('----------------【伪静态URL】', url);
+		var baseUrl = matches[1] || null,
+			params = matches[2] || null;
+		if (params) {
+			var tmpParts = [];
+			params = params.split('-');
+			for (var i = 0; i < params.length; i ++) { tmpParts.push(params[i] + '=' + params[++i]); }
+			params = tmpParts.join('&');
+		}
+		return (baseUrl || '') + (params ? '?' + params : '');
 	}
-	return (baseUrl || '') + (params ? '?' + params : '');
+	return url;
 }
 //将回源格式转换为伪静态URL
 function normalToFake (url) {
@@ -95,21 +94,21 @@ function normalToFake (url) {
 	///decoration/tpllist/?test1=x1&test2=&test3
 	//-->
 	///decoration/tpllist/-test1-x1-test2--test3-_xs.html
-	var pattern = /^([^\?])?(?:\?([^\?]*)?)$/,
+	var pattern = /^([^\?]*)(?:\?([^\?]*)?)$/,
 		matches = url.match(pattern);
 	if (matches) {
 		var baseUrl = matches[1] || null,
 			params = matches[2] || null;
 		if (params) {
 			var tmpParts = [];
-			params = params.split('&');
+			params = params.split('&').sort(); //进行一次排序，避免同一种URL生成不同的形式
 			for (var i = 0; i < params.length; i ++) {
 				var subPart = (params[i] + '').split('=');
 				if (subPart[0]) { tmpParts.push(subPart[0] + '-' + (subPart[1] || '')); } //字段名存在时才添加
 			}
 			params = tmpParts.join('-');
 		}
-		retUrl = (baseUrl || '') + (params ? '-' + params : '');
+		retUrl = (baseUrl || '') + (params ? '-' + params : '') + '_xs.html';
 	}
 	return retUrl;
 }
