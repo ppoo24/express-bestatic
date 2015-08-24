@@ -73,7 +73,7 @@ function fakeToNormal (url) {
 	///decoration/tpllist-test1-x1-test2--test3-_xs.html
 	//-->
 	///decoration/tpllist?test1=x1&test2=&test3
-	var matches = (url || '').match(/^([^-]*)(?:-([^\/]*))_xs.html$/);
+	var matches = (url || '').match(/^([^-]*)(?:-([^\/]+))_xs.html$/);
 	if (matches) { //【伪静态】替换 和 缓存
 		console.log('----------------【伪静态URL】', url);
 		var baseUrl = matches[1] || null,
@@ -90,12 +90,10 @@ function fakeToNormal (url) {
 }
 //将回源格式转换为伪静态URL
 function normalToFake (url) {
-	var retUrl = url;
 	///decoration/tpllist/?test1=x1&test2=&test3
 	//-->
 	///decoration/tpllist/-test1-x1-test2--test3-_xs.html
-	var pattern = /^([^\?]*)(?:\?([^\?]*))$/,
-		matches = url.match(pattern);
+	var matches = url.match(/^([^\?]*)(?:\?([^\?]+))$/);
 	if (matches) {
 		var baseUrl = matches[1] || null,
 			params = matches[2] || null;
@@ -108,9 +106,9 @@ function normalToFake (url) {
 			}
 			params = tmpParts.join('-');
 		}
-		retUrl = (baseUrl || '') + (params ? '-' + params : '') + '_xs.html';
+		return (baseUrl || '') + (params ? '-' + params : '') + '_xs.html';
 	}
-	return retUrl;
+	return url;
 }
 
 //将URL转换为文件名
