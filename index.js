@@ -73,7 +73,7 @@ function fakeToNormal (url) {
 	///decoration/tpllist-test1-x1-test2--test3-_xs.html
 	//-->
 	///decoration/tpllist?test1=x1&test2=&test3
-	var matches = (url || '').match(/^([^-]*)(?:-([^\/]*)?)_xs.html$/);
+	var matches = (url || '').match(/^([^-]*)(?:-([^\/]*))_xs.html$/);
 	if (matches) { //【伪静态】替换 和 缓存
 		console.log('----------------【伪静态URL】', url);
 		var baseUrl = matches[1] || null,
@@ -94,7 +94,7 @@ function normalToFake (url) {
 	///decoration/tpllist/?test1=x1&test2=&test3
 	//-->
 	///decoration/tpllist/-test1-x1-test2--test3-_xs.html
-	var pattern = /^([^\?]*)(?:\?([^\?]*)?)$/,
+	var pattern = /^([^\?]*)(?:\?([^\?]*))$/,
 		matches = url.match(pattern);
 	if (matches) {
 		var baseUrl = matches[1] || null,
