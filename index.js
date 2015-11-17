@@ -82,7 +82,7 @@ function fakeToNormal (url) {
 		if (params) {
 			var tmpParts = [];
 			params = params.split('-');
-			for (var i = 0; i < params.length; i ++) { tmpParts.push(params[i].replace(/~/g, '-') + '=' + params[++i].replace(/~/g, '-')); } //将~号转换回-号
+			for (var i = 0; i < params.length; i ++) { tmpParts.push((params[i] || '').replace(/~/g, '-') + '=' + (params[++i] || '').replace(/~/g, '-')); } //将~号转换回-号
 			params = tmpParts.join('&');
 		}
 		return (baseUrl || '') + (params ? '?' + params : '');
@@ -103,7 +103,7 @@ function normalToFake (url) {
 			params = params.split('&').sort(); //进行一次排序，避免同一种URL生成不同的形式
 			for (var i = 0; i < params.length; i ++) {
 				var subPart = (params[i] + '').split('=');
-				if (subPart[0]) { tmpParts.push(subPart[0].replace(/-/g, '~') + '-' + (subPart[1] || '').replace(/-/g, '~')); } //字段名存在时才添加【将key或value中的-号进行转义为~】
+				if (subPart[0]) { tmpParts.push((subPart[0] || '').replace(/-/g, '~') + '-' + (subPart[1] || '').replace(/-/g, '~')); } //字段名存在时才添加【将key或value中的-号进行转义为~】
 			}
 			params = tmpParts.join('-');
 		}
