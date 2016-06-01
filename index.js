@@ -71,10 +71,10 @@ module.exports = function (app, options) {
 
 //将伪静态URL转换为正常的回源格式
 function fakeToNormal (url) {
-	///decoration/tpllist-test1-x1-test2--test3-_xs.html
+	///decoration/tpllist-test1-x1-test2--test3-_xs.html?sdfsdfwe=xxxfsfwe&sdfsd
 	//-->
 	///decoration/tpllist?test1=x1&test2=&test3
-	var matches = (url || '').match(/^([^-]*)(?:-([^\/]+))_xs.html$/);
+	var matches = (url || '').match(/^([^-]*)(?:-([^\/]+?))_xs.html/);
 	if (matches) { //【伪静态】替换 和 缓存
 		// console.log('----------------【伪静态URL】', url);
 		var baseUrl = matches[1] || null,
